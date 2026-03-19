@@ -224,20 +224,23 @@
       };
 
       const executeDisaster = () => {
-        const code = disasterCode.trim().toLowerCase();
+        const code = disasterCode.trim();
         
-        if (!code.startsWith('kill')) {
+        // 指令部分 (kill) 不分大小寫
+        if (!code.toLowerCase().startsWith('kill')) {
           setErrorCount(prev => prev + 1);
-          showMessage('無效的災難代碼！格式應如 killaa', 'error');
+          showMessage('無效的災難代碼！格式應如 killaa 或 killAa', 'error');
           return;
         }
         
-        const targetTrait = code.replace('kill', '');
+        // 取出 kill 後面的基因型，並保留其大小寫以進行精準比對
+        const targetTrait = code.substring(4);
         if (!targetTrait) return;
 
         let killCount = 0;
         const updatedCells = cells.map(cell => {
-          if (cell.isAlive && cell.genotype.toLowerCase().includes(targetTrait.toLowerCase())) {
+          // 移除 toLowerCase()，嚴格區分大小寫 (確保 Aa 不會被當成 aa)
+          if (cell.isAlive && cell.genotype.includes(targetTrait)) {
             killCount++;
             return { ...cell, isAlive: false };
           }
@@ -475,7 +478,7 @@
                     <Icon name="AlertTriangle" className="w-5 h-5"/>
                     環境壓力測試
                   </h2>
-                  <p className="text-xs text-slate-400 mb-4">當老師宣佈災難發生時，請輸入全小寫代碼來篩選你的細胞群落。</p>
+                  <p className="text-xs text-slate-400 mb-4">當老師宣佈災難發生時，請輸入代碼來篩選你的細胞群落 (基因需區分大小寫，例如：killaa、killAa)。</p>
                   <div className="flex gap-2">
                     <input 
                       type="text" 
